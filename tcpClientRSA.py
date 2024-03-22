@@ -3,7 +3,7 @@ import random
 import ast
 import struct
 
-def miller_rabin(num, k=2):
+def miller_rabin(num, k=128):
     if num == 2 or num == 3:
         return True
 
@@ -32,9 +32,12 @@ def miller_rabin(num, k=2):
     return True
 
 def generate_large_prime(n_bits):
+    counter = 0
     while True:
         p = random.getrandbits(n_bits)
+        counter += 1
         if miller_rabin(p):
+            print(counter, 'times')
             return p
         
 def generate_primes(n_bits):
@@ -116,11 +119,15 @@ def recvall(sock, n):
     return data
 
 
-serverName = "192.168.15.21" # Put the server IP address here
+serverName = "10.2.20.88" # Put the server IP address here
 serverPort = 1300
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.settimeout(3600)
 clientSocket.connect((serverName,serverPort))
+
+# Generate pair of keys
+public_key, private_key = generate_keys(4096)
+private_d, private_N = private_key
 
 data_length = recvall(clientSocket, 4)
 data_length = struct.unpack(">I", data_length)[0]
@@ -146,10 +153,6 @@ cryptographSentence_length_packed = struct.pack('>I', cryptographSentence_length
 print("Sending bytes:", cryptographSentence_bytes)
 
 clientSocket.send(cryptographSentence_length_packed + cryptographSentence_bytes)
-
-# Generate pair of keys
-public_key, private_key = generate_keys(4096)
-private_d, private_N = private_key
 
 # Convert the public key to bytes
 public_key_bytes = bytes(str(public_key), "utf-8")

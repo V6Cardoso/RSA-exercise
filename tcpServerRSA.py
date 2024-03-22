@@ -3,7 +3,7 @@ import random
 import ast
 import struct
 
-def miller_rabin(num, k=2):
+def miller_rabin(num, k=128):
     if num == 2 or num == 3:
         return True
 
@@ -32,9 +32,12 @@ def miller_rabin(num, k=2):
     return True
 
 def generate_large_prime(n_bits):
+    counter = 0
     while True:
         p = random.getrandbits(n_bits)
+        counter += 1
         if miller_rabin(p):
+            print(counter, 'times')
             return p
         
 def generate_primes(n_bits):
@@ -107,7 +110,6 @@ def decrypt(cipher, d, N):
     return ''.join(message)
 
 def recvall(sock, n):
-    # Helper function to recv n bytes or return None if EOF is hit
     data = b''
     while len(data) < n:
         packet = sock.recv(n - len(data))
@@ -115,6 +117,7 @@ def recvall(sock, n):
             return None
         data += packet
     return data
+
 
 serverPort = 1300
 serverSocket = socket(AF_INET,SOCK_STREAM)
